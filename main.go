@@ -48,13 +48,24 @@ func main() {
 		hostsdata := new(common.HostsData)
 		hostsdata.AnsibleSetData(c.String("ansibledir"))
 		hostsdata.ServerspecSetData(c.String("serverspecdir"))
-		var outputdate common.HostsData
+
+		type Out struct {
+			common.HostsData
+			Env string
+		}
+
+		o := new(Out)
+		o.Hs = hostsdata
 
 		for _, env := range envlist {
+			o.Env = env
+			fmt.Printf("dddddddddddd:%v", o)
 			// todo:環境で出力を分ける(ここテンプレート上での分岐がいい気が）
 
 			file, err := os.Create(c.String("outputdir") + env + ".md")
+			// fileをもう一回読めばいいじゃない
 			tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
+			//tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
 
 			err = tmpl.Execute(file, hostsdata)
 			if err != nil {
