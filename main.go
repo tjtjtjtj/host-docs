@@ -1,167 +1,85 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"text/template"
 
-	"gopkg.in/yaml.v2"
+	"github.com/tjtjtjtj/host-docs/common"
+	"github.com/urfave/cli"
 )
 
-type Data struct {
-	Hostname string `yaml:"hostname"`
-	I3env    string `yaml:"i3_env"`
-	Ip_addr  string `yaml:"ip_addr"`
-	Cores    string `yaml:":cpu"`
-	Ram      string `yaml:":ram"`
-	Hdd      string `yaml:":hdd"`
-	Os       string `yaml:":os"`
-	If1      string `yaml:":if1"`
-	If2      string `yaml:":if2"`
-	If3      string `yaml:":if3"`
-	//ここ構造体のネスト
-}
+var (
+	hash      string
+	builddate string
+	goversion string
+	version   = "1.0.0"
+)
 
-type Serverspec_Data struct {
-	Cores string `yaml:":cpu"`
-	Ram   string `yaml:":ram"`
-	Hdd   string `yaml:":hdd"`
-	Os    string `yaml:":os"`
-	If1   string `yaml:":if1"`
-	If2   string `yaml:":if2"`
-	If3   string `yaml:":if3"`
-}
+var envlist = [...]string{"production", "staging", "stress"}
 
 func main() {
-	fmt.Println("vim-go")
-	dirwalk("/home/jenkins/ansible/host_vars")
-}
 
-func dirwalk(dir string) {
-	staging_file, err := os.Create("./staging.md")
-	production_file, err := os.Create("./production.md")
-	if err != nil {
-		panic(err)
+	app := cli.NewApp()
+	app.Name = "hostvars-batch"
+	app.Usage = "make host-vars markdown list"
+	app.Version = version
+
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "ansibledir",
+			Usage: "ansible host-vars dir",
+			Value: "./common/ansible/host_vars/",
+		},
+		cli.StringFlag{
+			Name:  "serverspecdir",
+			Usage: "serverspec host_vars dir",
+			Value: "./common/serverspec/host_vars/",
+		},
+		cli.StringFlag{
+			Name:  "outputdir",
+			Usage: "markdown list ouput dir",
+			Value: "/tmp/",
+		},
 	}
 
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		panic(err)
-	}
+	app.Action = func(c *cli.Context) error {
+		hostsdata := new(common.HostsData)
+		hostsdata.AnsibleSetData(c.String("ansibledir"))
+		hostsdata.ServerspecSetData(c.String("serverspecdir"))
+		var outputdate common.HostsData
 
-	production_data := make([]Data, 0, len(files))
-	staging_data := make([]Data, 0, len(files))
-	var d Data
+		for _, env := range envlist {
+			// todo:環境で出力を分ける(ここテンプレート上での分岐がいい気が）
 
-	for _, file := range files {
+			file, err := os.Create(c.String("outputdir") + env + ".md")
+			tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
 
-		if file.Mode().IsRegular() {
-			fmt.Printf("file:%s\n", file.Name())
-
-			buf, err := ioutil.ReadFile(dir + "/" + file.Name())
+			err = tmpl.Execute(file, hostsdata)
 			if err != nil {
-				panic(err)
+				return err
 			}
-
-			err = yaml.Unmarshal(buf, &d)
-			fmt.Println(d)
-
-			switch d.I3env {
-			case "production":
-				production_data = append(production_data, d)
-			case "staging":
-				staging_data = append(staging_data, d)
-			}
-
-		} else {
-			fmt.Printf("dir:%s\n", file.Name())
 		}
+		return nil
 	}
 
-	var serverspec_buf []byte
-	var s_d Serverspec_Data
-Pro_RowLoop:
-	for k, host := range production_data {
-		serverspec_buf, err = ioutil.ReadFile("/home/jenkins/serverspec/host_vars/" + host.Ip_addr + ".yml")
-		if err != nil {
-			fmt.Printf("not found %s \n", host.Hostname)
-			production_data[k].Cores = "-"
-			production_data[k].Ram = "-"
-			production_data[k].Hdd = "-"
-			production_data[k].Os = "-"
-			production_data[k].If1 = "-"
-			production_data[k].If2 = "-"
-			production_data[k].If3 = "-"
-			continue Pro_RowLoop
+	cli.VersionPrinter = func(c *cli.Context) {
+		pv := struct {
+			Version   string
+			Hash      string
+			BuildDate string
+			GoVersion string
+		}{
+			Version:   app.Version,
+			Hash:      hash,
+			BuildDate: builddate,
+			GoVersion: goversion,
 		}
-		//fmt.Printf("serverspec: %v", string(serverspec_buf))
-		err = yaml.Unmarshal(serverspec_buf, &s_d)
-		//fmt.Printf("serverspec: %v\n", s_d)
-		production_data[k].Cores = s_d.Cores
-		production_data[k].Ram = s_d.Ram
-		production_data[k].Hdd = s_d.Hdd
-		production_data[k].Os = s_d.Os
-		production_data[k].If1 = s_d.If1
-		production_data[k].If2 = s_d.If2
-		production_data[k].If3 = s_d.If3
-		//fmt.Printf("hostcores: %s\n", host.Cores)
+		pv_str, _ := json.Marshal(pv)
+		fmt.Println(string(pv_str))
 	}
 
-Stg_RowLoop:
-	for k, host := range staging_data {
-		serverspec_buf, err = ioutil.ReadFile("/home/jenkins/serverspec/host_vars/" + host.Ip_addr + ".yml")
-		if err != nil {
-			fmt.Printf("not found %s \n", host.Hostname)
-			staging_data[k].Cores = "-"
-			staging_data[k].Ram = "-"
-			staging_data[k].Hdd = "-"
-			staging_data[k].Os = "-"
-			staging_data[k].If1 = "-"
-			staging_data[k].If2 = "-"
-			staging_data[k].If3 = "-"
-			continue Stg_RowLoop
-		}
-		//fmt.Printf("serverspec: %v", string(serverspec_buf))
-		err = yaml.Unmarshal(serverspec_buf, &s_d)
-		//fmt.Printf("serverspec: %v\n", s_d)
-		staging_data[k].Cores = s_d.Cores
-		staging_data[k].Cores = s_d.Cores
-		staging_data[k].Ram = s_d.Ram
-		staging_data[k].Hdd = s_d.Hdd
-		staging_data[k].Os = s_d.Os
-		staging_data[k].If1 = s_d.If1
-		staging_data[k].If2 = s_d.If2
-		staging_data[k].If3 = s_d.If3
-		//fmt.Printf("hostcores: %s\n", host.Cores)
-	}
+	app.Run(os.Args)
 
-	tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
-
-	fmt.Printf("%v", production_data)
-
-	err = tmpl.Execute(production_file, production_data)
-	if err != nil {
-		panic(err)
-	}
-
-	err = tmpl.Execute(staging_file, staging_data)
-	if err != nil {
-		panic(err)
-	}
-
-	return
 }
-
-/*
-func main() {
-  buf, err := ioutil.ReadFile("test.yml")
-  if err != nil {
-    panic(err)
-  }
-
-  var d Data
-  err = yaml.Unmarshal(buf, &d)
-  fmt.Println(d)
-}
-*/
