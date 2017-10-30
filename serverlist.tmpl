@@ -6,6 +6,6 @@ production
 
 |host|env|IP|Core|RAM|HDD|OS|if1|if2|if3|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-{{range . -}}
+{{range .Hs -}}
 |{{ .Hostname}}|{{.I3env}}|{{.Ip_addr}}|{{.Cores}}|{{.Ram}}|{{.Hdd}}|{{.Os}}|{{.If1}}|{{.If2}}|{{.If3 -}}|
 {{end }}

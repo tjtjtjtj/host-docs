@@ -50,24 +50,23 @@ func main() {
 		hostsdata.ServerspecSetData(c.String("serverspecdir"))
 
 		type Out struct {
-			common.HostsData
+			Hs  *common.HostsData
 			Env string
 		}
-
-		o := new(Out)
-		o.Hs = hostsdata
+		O := new(Out)
+		O.Hs = hostsdata
 
 		for _, env := range envlist {
-			o.Env = env
-			fmt.Printf("dddddddddddd:%v", o)
+			O.Env = env
+			fmt.Printf("\ndddddddddddd:%v\n", O)
 			// todo:環境で出力を分ける(ここテンプレート上での分岐がいい気が）
-
 			file, err := os.Create(c.String("outputdir") + env + ".md")
 			// fileをもう一回読めばいいじゃない
 			tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
 			//tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
 
-			err = tmpl.Execute(file, hostsdata)
+			//err = tmpl.Execute(file, hostsdata)
+			err = tmpl.Execute(file, O)
 			if err != nil {
 				return err
 			}
