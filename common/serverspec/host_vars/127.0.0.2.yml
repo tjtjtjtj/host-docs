@@ -1,8 +1,8 @@
-:cpu: 2
-:ram: 4
+:cpu: 4
+:ram: 8
 :swap: 4
-:hdd: 45
-:os: 6.5
+:hdd: 160
+:os: 7.2
 :if1: eth0
-:if2: na
+:if2: eth1
 :if3: na

@@ -19,6 +19,11 @@ var (
 
 var envlist = [...]string{"production", "staging", "stress"}
 
+type Serverlistdata struct {
+	HostsData *common.HostsData
+	Env       string
+}
+
 func main() {
 
 	app := cli.NewApp()
@@ -45,28 +50,16 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		hostsdata := new(common.HostsData)
-		hostsdata.AnsibleSetData(c.String("ansibledir"))
-		hostsdata.ServerspecSetData(c.String("serverspecdir"))
-
-		type Out struct {
-			Hs  *common.HostsData
-			Env string
-		}
-		O := new(Out)
-		O.Hs = hostsdata
+		s := new(Serverlistdata)
+		s.HostsData = new(common.HostsData)
+		s.HostsData.AnsibleSetData(c.String("ansibledir"))
+		s.HostsData.ServerspecSetData(c.String("serverspecdir"))
 
 		for _, env := range envlist {
-			O.Env = env
-			fmt.Printf("\ndddddddddddd:%v\n", O)
-			// todo:環境で出力を分ける(ここテンプレート上での分岐がいい気が）
+			s.Env = env
 			file, err := os.Create(c.String("outputdir") + env + ".md")
-			// fileをもう一回読めばいいじゃない
 			tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
-			//tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
-
-			//err = tmpl.Execute(file, hostsdata)
-			err = tmpl.Execute(file, O)
+			err = tmpl.Execute(file, s)
 			if err != nil {
 				return err
 			}

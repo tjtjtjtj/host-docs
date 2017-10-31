@@ -1,11 +1,12 @@
-production
+{{ $e := .Env -}}
+{{$e}}
 ================
-
-| Left align | Right align | Center align |
-|:-----------|------------:|:------------:|
 
 |host|env|IP|Core|RAM|HDD|OS|if1|if2|if3|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-{{range .Hs -}}
-|{{ .Hostname}}|{{.I3env}}|{{.Ip_addr}}|{{.Cores}}|{{.Ram}}|{{.Hdd}}|{{.Os}}|{{.If1}}|{{.If2}}|{{.If3 -}}|
-{{end }}
+{{range .HostsData -}}
+{{if eq .I3env $e -}}
+|{{ .Hostname}}|{{.I3env}}|{{.Ip_addr}}|{{.Cpu}}|{{.Ram}}|{{.Hdd}}|{{.Os}}|{{.If1}}|{{.If2}}|{{.If3 -}}|
+{{end -}}
+{{end}}
+
