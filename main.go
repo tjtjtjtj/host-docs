@@ -58,7 +58,7 @@ func main() {
 		for _, env := range envlist {
 			s.Env = env
 			file, err := os.Create(c.String("outputdir") + env + ".md")
-			tmpl := template.Must(template.ParseFiles("serverlist.tmpl"))
+			tmpl := template.Must(template.ParseFiles("./assets/serverlist.tmpl"))
 			err = tmpl.Execute(file, s)
 			if err != nil {
 				return err
