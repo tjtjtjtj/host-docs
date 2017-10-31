@@ -6,9 +6,12 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/tjtjtjtj/host-docs/assets"
 	"github.com/tjtjtjtj/host-docs/common"
 	"github.com/urfave/cli"
 )
+
+//go:generate go-bindata -o assets/assets.go -pkg assets assets/
 
 var (
 	hash      string
@@ -35,12 +38,12 @@ func main() {
 		cli.StringFlag{
 			Name:  "ansibledir",
 			Usage: "ansible host-vars dir",
-			Value: "./common/ansible/host_vars/",
+			Value: "common/ansible/host_vars/",
 		},
 		cli.StringFlag{
 			Name:  "serverspecdir",
 			Usage: "serverspec host_vars dir",
-			Value: "./common/serverspec/host_vars/",
+			Value: "common/serverspec/host_vars/",
 		},
 		cli.StringFlag{
 			Name:  "outputdir",
@@ -58,7 +61,15 @@ func main() {
 		for _, env := range envlist {
 			s.Env = env
 			file, err := os.Create(c.String("outputdir") + env + ".md")
-			tmpl := template.Must(template.ParseFiles("./assets/serverlist.tmpl"))
+			if err != nil {
+				return err
+			}
+			tmpl_file, err := assets.Asset("assets/serverlist.tmpl")
+			if err != nil {
+				return err
+			}
+
+			tmpl := template.Must(template.New("md").Parse(string(tmpl_file)))
 			err = tmpl.Execute(file, s)
 			if err != nil {
 				return err

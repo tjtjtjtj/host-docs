@@ -1,2 +1,5 @@
 *.md
 testfile
+
+# ignore go-bindata
+assets/assets.go

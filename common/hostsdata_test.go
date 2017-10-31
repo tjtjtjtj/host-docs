@@ -17,8 +17,8 @@ func TestSetData(t *testing.T) {
 	}
 
 	hostsdata := new(HostsData)
-	hostsdata.AnsibleSetData("./ansible/host_vars/")
-	hostsdata.ServerspecSetData("./serverspec/host_vars/")
+	hostsdata.AnsibleSetData("ansible/host_vars/")
+	hostsdata.ServerspecSetData("serverspec/host_vars/")
 
 	if !reflect.DeepEqual(*hostsdata, expected) {
 		t.Fatalf("It is different from the expected result \n%v != \n%v", *hostsdata, expected)
