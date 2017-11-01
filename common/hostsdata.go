@@ -9,23 +9,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ansibleとserverspec host_varsのinclude
+// HostData ansibleとserverspec host_varsのinclude
 type HostData struct {
 	AnsibleData    `yaml:",inline"`
 	ServerspecData `yaml:",inline"`
 }
 
-// ansibleとserverspecの全host_vars格納
+// HostsData ansibleとserverspecの全host_vars格納
 type HostsData []HostData
 
-// ansible host_varsより、必要項目のみ格納
+// AnsibleData ansible host_varsより、必要項目のみ格納
 type AnsibleData struct {
 	Hostname string `yaml:"hostname"`
 	I3env    string `yaml:"i3_env"`
 	Ipaddr   string `yaml:"ip_addr"`
 }
 
-// serverspec host_varsより、必要項目のみ格納
+// ServerspecData serverspec host_varsより、必要項目のみ格納
 type ServerspecData struct {
 	CPU string `yaml:":cpu"`
 	RAM string `yaml:":ram"`
@@ -36,7 +36,7 @@ type ServerspecData struct {
 	If3 string `yaml:":if3"`
 }
 
-// ansible host_varsのディレクトリより読み込みHostsDataにセット
+// AnsibleSetData ansible host_varsのディレクトリより読み込みHostsDataにセット
 func (hostsdata *HostsData) AnsibleSetData(dir string) {
 	err := filepath.Walk(dir, readAnsiblehost(hostsdata))
 	if err != nil {
@@ -59,18 +59,18 @@ func readAnsiblehost(hostsdata *HostsData) filepath.WalkFunc {
 	}
 }
 
-// HostsDataに格納されているIPに対して
+// ServerspecSetData HostsDataに格納されているIPに対して
 // serverspec host_varsのディレクトリより読み込みHostsDataにセット
 func (hostsdata HostsData) ServerspecSetData(dir string) {
-	var serverspec_buf []byte
+	var serverspecbuf []byte
 	var err error
 Pro_RowLoop:
 	//for i, _ := range hostsdata {
 	for i := range hostsdata {
-		serverspec_buf, err = ioutil.ReadFile(dir + hostsdata[i].Ipaddr + ".yml")
+		serverspecbuf, err = ioutil.ReadFile(dir + hostsdata[i].Ipaddr + ".yml")
 		if err != nil {
 			continue Pro_RowLoop
 		}
-		err = yaml.Unmarshal(serverspec_buf, &hostsdata[i])
+		err = yaml.Unmarshal(serverspecbuf, &hostsdata[i])
 	}
 }
