@@ -12,6 +12,7 @@ dependencies:
     - go get github.com/Masterminds/glide
     - go install github.com/Masterminds/glide
     - glide install 
+    - pwd;ls -lR
 
 test:
   pre:
