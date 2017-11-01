@@ -7,7 +7,7 @@ machine:
     - sudo rm -rf /usr/local/go
     - sudo tar -C /usr/local -xzf downloads/$GODIST
 dependencies:
-  pre:
+  override:
     - go get -v github.com/golang/lint/golint
 
 test:
