@@ -9,6 +9,7 @@ machine:
 dependencies:
   override:
     - go get -v github.com/golang/lint/golint
+    - curl https://glide.sh/get | sh
 
 test:
   pre:
