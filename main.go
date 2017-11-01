@@ -22,7 +22,7 @@ var (
 
 var envlist = [...]string{"production", "staging", "stress"}
 
-type Serverlistdata struct {
+type serverlistdata struct {
 	HostsData *common.HostsData
 	Env       string
 }
@@ -53,7 +53,7 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		s := new(Serverlistdata)
+		s := new(serverlistdata)
 		s.HostsData = new(common.HostsData)
 		s.HostsData.AnsibleSetData(c.String("ansibledir"))
 		s.HostsData.ServerspecSetData(c.String("serverspecdir"))
@@ -64,12 +64,12 @@ func main() {
 			if err != nil {
 				return err
 			}
-			tmpl_file, err := assets.Asset("assets/serverlist.tmpl")
+			tmplData, err := assets.Asset("assets/serverlist.tmpl")
 			if err != nil {
 				return err
 			}
 
-			tmpl := template.Must(template.New("md").Parse(string(tmpl_file)))
+			tmpl := template.Must(template.New("md").Parse(string(tmplData)))
 			err = tmpl.Execute(file, s)
 			if err != nil {
 				return err
@@ -90,8 +90,8 @@ func main() {
 			BuildDate: builddate,
 			GoVersion: goversion,
 		}
-		pv_str, _ := json.Marshal(pv)
-		fmt.Println(string(pv_str))
+		pvStr, _ := json.Marshal(pv)
+		fmt.Println(string(pvStr))
 	}
 
 	app.Run(os.Args)
