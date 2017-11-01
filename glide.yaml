@@ -1,0 +1,4 @@
+package: github.com/tjtjtjtj/host-docs
+import:
+- package: github.com/urfave/cli
+- package: gopkg.in/yaml.v2

@@ -3,3 +3,6 @@ testfile
 
 # ignore go-bindata
 assets/assets.go
+
+# ignore vendor dir
+vendor
