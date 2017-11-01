@@ -6,6 +6,7 @@ machine:
     - test -e downloads/$GODIST || curl -o downloads/$GODIST https://storage.googleapis.com/golang/$GODIST
     - sudo rm -rf /usr/local/go
     - sudo tar -C /usr/local -xzf downloads/$GODIST
+    - echo "export GOPATH=$HOME/go" >> ~/.circlerc;
 dependencies:
   override:
     - go get -v github.com/golang/lint/golint
