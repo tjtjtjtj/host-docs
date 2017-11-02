@@ -18,8 +18,9 @@ test:
     - go version
     - mkdir -p "$IMPORT_PATH"
     - ln -sf "$(pwd)" "$APP_PATH"
-    - go get -v github.com/golang/lint/golint
-    - cd "$APP_PATH" && pwd && ls -lR && glide install
+    - go get -u github.com/jteeuwen/go-bindata/...
+    - go get -u github.com/golang/lint/golint
+    - cd "$APP_PATH" glide install
   override:
     - cd "$APP_PATH" go vet $(glide novendor)
     - cd "$APP_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
