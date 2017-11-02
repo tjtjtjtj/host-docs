@@ -31,7 +31,6 @@ deployment:
   release:
     tag: /v[0-9]+\.[0-9]+\.[0-9]+/
     commands:
-      - docker run -e GITHUB_TOKEN=${GITHUB_TOKEN} -e CIRCLE_PROJECT_REPONAME=${CIRCLE_PROJECT_REPONAME} -e GITHUB_API=${GITHUB_API} -v $(pwd):/go/src/git.dmm.com/dre/pigeon golang:1.8.3 sh -ex /go/src/git.dmm.com/dre/pigeon/sh/release_github.sh
-      - go get -v github.com/aktau/github-release
-      - sh sh/build.sh
-      - github-release upload --user sre --repo ${CIRCLE_PROJECT_REPONAME} --tag $(git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1') --name hostvars-batch --file hostvars-batch -R
+      - cd "$APP_PAT" && sh sh/build.sh
+      - go get -u github.com/aktau/github-release
+      - github-release upload --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag $(git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1') --name hostvars-batch --file hostvars-batch -R
