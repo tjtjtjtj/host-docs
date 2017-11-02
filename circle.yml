@@ -9,9 +9,9 @@ machine:
     - sudo tar -C /usr/local -xzf downloads/$GODIST
 dependencies:
   override:
-    - echo $GOPATH
     - mkdir -p "$GOPATH/src/$IMPORT_PATH"
     - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
+    - cd "$GOPATH/src/$IMPORT_PATH" 
     - go get -v github.com/golang/lint/golint
     - go get github.com/Masterminds/glide
     - go install github.com/Masterminds/glide
@@ -22,7 +22,6 @@ test:
   pre:
     - go version
   override:
-    - echo $GOPATH
     - go vet $(glide novendor)
     - test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
     - ls -lR "$GOPATH/src/$IMPORT_PATH"
