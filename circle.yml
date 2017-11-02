@@ -21,6 +21,7 @@ test:
     - go get -u github.com/jteeuwen/go-bindata/...
     - go get -u github.com/golang/lint/golint
     - cd "$APP_PATH" glide install
+    - cd "$APP_PATH" ls -lR
   override:
     - cd "$APP_PATH" go vet $(glide novendor)
     - cd "$APP_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
