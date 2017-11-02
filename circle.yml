@@ -23,6 +23,7 @@ test:
   override:
     - cd "$APP_PATH" go vet $(glide novendor)
     - cd "$APP_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
+    - cd "$APP_PATH" && go generate
     - cd "$APP_PATH" && go test -v $(glide novendor)
 
 deployment:
