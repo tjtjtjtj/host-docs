@@ -9,6 +9,7 @@ machine:
     - sudo tar -C /usr/local -xzf downloads/$GODIST
 dependencies:
   override:
+    - echo $GOPATH | sed 's/:.*$//g'
     - mkdir -p "$GOPATH/src/$IMPORT_PATH"
     - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
     - cd "$GOPATH/src/$IMPORT_PATH" 
