@@ -18,14 +18,12 @@ test:
     - go version
     - mkdir -p "$IMPORT_PATH"
     - ln -sf "$(pwd)" "$IMPORT_PATH"
-    - cd "$IMPORT_PATH" 
-    - go get -v github.com/golang/lint/golint
-    - glide install
+    - cd "$IMPORT_PATH" && go get -v github.com/golang/lint/golint
+    - cd "$IMPORT_PATH" && glide install
   override:
-    - cd "$IMPORT_PATH"
-    - go vet $(glide novendor)
-    - test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
-    - go test -v $(glide novendor)
+    - cd "$IMPORT_PATH" && go vet $(glide novendor)
+    - cd "$IMPORT_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
+    - cd "$IMPORT_PATH" && go test -v $(glide novendor)
 
 deployment:
   release:
