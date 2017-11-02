@@ -15,6 +15,7 @@ dependencies:
     - go get github.com/Masterminds/glide
     - go install github.com/Masterminds/glide
     - glide install 
+    - ls -lR "$GOPATH/src/$IMPORT_PATH"
 
 test:
   pre:
@@ -22,6 +23,7 @@ test:
   override:
     - go vet $(glide novendor)
     - test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
+    - ls -lR "$GOPATH/src/$IMPORT_PATH"
     - go test -v $(glide novendor)
 
 deployment:
