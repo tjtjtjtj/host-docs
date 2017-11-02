@@ -1,9 +1,9 @@
 machine:
   environment:
     GODIST: "go1.9.1.linux-amd64.tar.gz"
-    IMPORT_PATH: "$(echo $GOPATH | sed 's/:.*$//g')/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+    IMPORT_PATH: "$(echo $GOPATH | sed 's/:.*$//g')/src/github.com/$CIRCLE_PROJECT_USERNAME"
+    APP_PATH: "$IMPORT_PATH/$CIRCLE_PROJECT_REPONAME"
   post:
-    - echo $IMPORT_PATH
     - mkdir -p downloads
     - test -e downloads/$GODIST || curl -o downloads/$GODIST https://storage.googleapis.com/golang/$GODIST
     - sudo rm -rf /usr/local/go
@@ -17,13 +17,13 @@ test:
   pre:
     - go version
     - mkdir -p "$IMPORT_PATH"
-    - ln -sf "$(pwd)" "$IMPORT_PATH"
+    - ln -sf "$(pwd)" "$APP_PATH"
     - go get -v github.com/golang/lint/golint
-    - cd "$IMPORT_PATH" && pwd && ls -lR && glide install
+    - cd "$APP_PATH" && pwd && ls -lR && glide install
   override:
-    - cd "$IMPORT_PATH" go vet $(glide novendor)
-    - cd "$IMPORT_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
-    - cd "$IMPORT_PATH" && go test -v $(glide novendor)
+    - cd "$APP_PATH" go vet $(glide novendor)
+    - cd "$APP_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
+    - cd "$APP_PATH" && go test -v $(glide novendor)
 
 deployment:
   release:
