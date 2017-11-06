@@ -5,6 +5,7 @@ machine:
     APP_PATH: "$IMPORT_PATH/$CIRCLE_PROJECT_REPONAME"
     TAG: $(git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1')
   post:
+    - echo ${TAG}
     - mkdir -p downloads
     - test -e downloads/$GODIST || curl -o downloads/$GODIST https://storage.googleapis.com/golang/$GODIST
     - sudo rm -rf /usr/local/go
@@ -34,5 +35,6 @@ deployment:
     commands:
       - cd "$APP_PATH" && sh sh/build.sh
       - go get -u github.com/aktau/github-release
+      - echo ${TAG}
       - github-release release --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name ${TAG} 
       - github-release upload --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name host-docs --file host-docs -R
