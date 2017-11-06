@@ -6,7 +6,6 @@ machine:
     TAG: $(git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1')
     LS: $(ls -lR)
   post:
-    - git describe --tags
     - pwd
     - ls -lR
     - echo ${TAG}
