@@ -5,7 +5,6 @@ machine:
     APP_PATH: "$IMPORT_PATH/$CIRCLE_PROJECT_REPONAME"
     TAG: $(cd $CIRCLE_PROJECT_REPONAME && git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1')
   post:
-    - echo $TAG
     - mkdir -p downloads
     - test -e downloads/$GODIST || curl -o downloads/$GODIST https://storage.googleapis.com/golang/$GODIST
     - sudo rm -rf /usr/local/go
@@ -18,24 +17,22 @@ dependencies:
 test:
   pre:
     - go version
-    - pwd
-    - mkdir -p "$IMPORT_PATH"
-    - ln -sf "$(pwd)" "$APP_PATH"
+    - mkdir -p $IMPORT_PATH
+    - ln -sf $(pwd) $APP_PATH
     - go get -u github.com/jteeuwen/go-bindata/...
     - go get -u github.com/golang/lint/golint
-    - cd "$APP_PATH" && glide install
+    - cd $APP_PATH && glide install
   override:
-    - cd "$APP_PATH" go vet $(glide novendor)
-    - cd "$APP_PATH" && test -z "$(golint  $(glide novendor) | tee /dev/stderr)"
-    - cd "$APP_PATH" && go generate
-    - cd "$APP_PATH" && go test -v $(glide novendor)
+    - cd $APP_PATH go vet $(glide novendor)
+    - cd $APP_PATH && test -z $(golint  $(glide novendor) | tee /dev/stderr)
+    - cd $APP_PATH && go generate
+    - cd $APP_PATH && go test -v $(glide novendor)
 
 deployment:
   release:
     tag: /v[0-9]+\.[0-9]+\.[0-9]+/
     commands:
-      - cd "$APP_PATH" && sh sh/build.sh
+      - cd $APP_PATH && sh sh/build.sh
       - go get -u github.com/aktau/github-release
-      - echo ${TAG}
-      - github-release release --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name ${TAG} 
-      - github-release upload --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name host-docs --file host-docs -R
+      - github-release release --user tjtjtjtj --repo $CIRCLE_PROJECT_REPONAME --tag $TAG --name $TAG 
+      - github-release upload --user tjtjtjtj --repo $CIRCLE_PROJECT_REPONAME --tag $TAG --name host-docs --file host-docs -R
