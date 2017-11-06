@@ -3,13 +3,9 @@ machine:
     GODIST: "go1.9.1.linux-amd64.tar.gz"
     IMPORT_PATH: "$(echo $GOPATH | sed 's/:.*$//g')/src/github.com/$CIRCLE_PROJECT_USERNAME"
     APP_PATH: "$IMPORT_PATH/$CIRCLE_PROJECT_REPONAME"
-    TAG: $(git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1')
-    LS: $(ls -lR)
+    TAG: $(cd $CIRCLE_PROJECT_REPONAME && git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1')
   post:
-    - pwd
-    - ls -lR
-    - echo ${TAG}
-    - echo ${LS}
+    - echo $TAG
     - mkdir -p downloads
     - test -e downloads/$GODIST || curl -o downloads/$GODIST https://storage.googleapis.com/golang/$GODIST
     - sudo rm -rf /usr/local/go
@@ -22,6 +18,7 @@ dependencies:
 test:
   pre:
     - go version
+    - pwd
     - mkdir -p "$IMPORT_PATH"
     - ln -sf "$(pwd)" "$APP_PATH"
     - go get -u github.com/jteeuwen/go-bindata/...
