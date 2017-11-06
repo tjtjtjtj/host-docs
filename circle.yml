@@ -34,5 +34,5 @@ deployment:
     commands:
       - cd "$APP_PATH" && sh sh/build.sh
       - go get -u github.com/aktau/github-release
-      - github-release release --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name ${TAG} --description ${TAG} 
+      - github-release release --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name ${TAG} 
       - github-release upload --user tjtjtjtj --repo ${CIRCLE_PROJECT_REPONAME} --tag ${TAG} --name host-docs --file host-docs -R
