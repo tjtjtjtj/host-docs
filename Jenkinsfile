@@ -13,7 +13,7 @@ node('mslave') {
 
         // 本来であればここにhost-varsの同期処理
 
-        sh "curl -sO $(curl -s https://api.github.com/repos/tjtjtjtj/host-docs/releases | jq -r '.[0].assets[] | select(.name | test("host-docs")) | .browser_download_url')"
+        sh "curl -sO \$(curl -s https://api.github.com/repos/tjtjtjtj/host-docs/releases | jq -r '.[0].assets[] | select(.name | test("host-docs")) | .browser_download_url')"
 
     }
 
