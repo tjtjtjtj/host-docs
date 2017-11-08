@@ -29,10 +29,12 @@ node('mslave') {
   stage('update'){
     def BRANCH_NAME="update-${BUILD_NUMBER}"
 
-    // 更新されたmarkdownの一覧をコピー
-    sh "cp production.md hostvars-docs/production.md"
-    sh "cp staging.md hostvars-docs/staging.md"
-    sh "cp stress.md hostvars-docs/stress.md"
+    withEnv(["DIR_PATH=hostvars-docs/docs"]) {
+      // 更新されたmarkdownの一覧をコピー
+      sh "cp production.md $DIR_PATH/production.md"
+      sh "cp staging.md $DIR_PATH/staging.md"
+      sh "cp stress.md $DIR_PATH/stress.md"
+    }
 
     // gitのリポジトリへpush
     dir('hostvars-docs') {
