@@ -37,31 +37,32 @@ node('mslave') {
     // gitのリポジトリへpush
     dir('hostvars-docs') {
             
-    // 各種設定
-    sh """
-      git config --local user.name tjtjtjtj
-      git config --local user.email 'test@dummy.com'
-      git config --local push.default simple
-      git checkout -b ${BRANCH_NAME}
-      git add .
-      git commit -m 'Update docs'
-    """
-
-    withCredentials([usernamePassword(credentialsId: 'githubuser', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-
-      // Remoteにpush
-      sh "git push --set-upstream https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/tjtjtjtj/hostvars-docs.git ${BRANCH_NAME}"
-           
-      // PR作成
+      // 各種設定
       sh """
-        sudo docker run --rm \
-        -v `pwd`:/opt/hub \
-        -e GITHUB_HOST=github.com \
-        -e GITHUB_USER=${GIT_USERNAME} \
-        -e GITHUB_PASSWORD=${GIT_PASSWORD} \
-        tianon/github-hub:latest \
-        hub pull-request -m 'Update docs'
+        git config --local user.name tjtjtjtj
+        git config --local user.email 'test@dummy.com'
+        git config --local push.default simple
+        git checkout -b ${BRANCH_NAME}
+        git add .
+        git commit -m 'Update docs'
       """
+
+      withCredentials([usernamePassword(credentialsId: 'githubuser', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+
+        // Remoteにpush
+        sh "git push --set-upstream https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/tjtjtjtj/hostvars-docs.git ${BRANCH_NAME}"
+           
+        // PR作成
+        sh """
+         sudo docker run --rm \
+         -v `pwd`:/opt/hub \
+         -e GITHUB_HOST=github.com \
+         -e GITHUB_USER=${GIT_USERNAME} \
+         -e GITHUB_PASSWORD=${GIT_PASSWORD} \
+         tianon/github-hub:latest \
+         hub pull-request -m 'Update docs'
+        """
+      }
     }
   }
 }
