@@ -12,8 +12,8 @@ node('mslave') {
     ])
 
     // host-varsの取得
-    sh "rsync -r --delete 192168.20.41:/home/jenkins/ansible/host_vars/ ./ansible-host_vars
-    sh "rsync -r --delete 192168.20.41:/home/jenkins/serverspec/host_vars/ ./serverspec-host_vars
+    sh "rsync -r --delete 192.168.20.41:/home/jenkins/ansible/host_vars/ ./ansible-host_vars"
+    sh "rsync -r --delete 192.168.20.41:/home/jenkins/serverspec/host_vars/ ./serverspec-host_vars"
 
     withEnv(["URLPATH=\$(curl -s https://api.github.com/repos/tjtjtjtj/host-docs/releases | jq -r '.[0].assets[] | select(.name | test(\"host-docs\")) | .browser_download_url')"]) {
       sh "curl -sLO $URLPATH"
