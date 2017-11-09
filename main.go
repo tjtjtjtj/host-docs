@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"text/template"
 
 	"github.com/tjtjtjtj/host-docs/assets"
@@ -38,29 +39,29 @@ func main() {
 		cli.StringFlag{
 			Name:  "ansibledir",
 			Usage: "ansible host-vars dir",
-			Value: "common/ansible/host_vars/",
+			Value: "common/ansible/host_vars",
 		},
 		cli.StringFlag{
 			Name:  "serverspecdir",
 			Usage: "serverspec host_vars dir",
-			Value: "common/serverspec/host_vars/",
+			Value: "common/serverspec/host_vars",
 		},
 		cli.StringFlag{
 			Name:  "outputdir",
 			Usage: "markdown list ouput dir",
-			Value: "/tmp/",
+			Value: "/tmp",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
 		s := new(serverlistdata)
 		s.HostsData = new(common.HostsData)
-		s.HostsData.AnsibleSetData(c.String("ansibledir"))
-		s.HostsData.ServerspecSetData(c.String("serverspecdir"))
+		s.HostsData.AnsibleSetData(filepath.Clean(c.String("ansibledir")))
+		s.HostsData.ServerspecSetData(filepath.Clean(c.String("serverspecdir")))
 
 		for _, env := range envlist {
 			s.Env = env
-			file, err := os.Create(c.String("outputdir") + env + ".md")
+			file, err := os.Create(filepath.Join(filepath.Clean(c.String("outputdir")), env+".md"))
 			if err != nil {
 				return err
 			}
