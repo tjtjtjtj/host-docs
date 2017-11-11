@@ -101,14 +101,9 @@ func main() {
 		fmt.Println(string(pvStr))
 	}
 
-	return msg(app.Run(os.Args))
-
-}
-
-func msg(err error) int {
+	err = app.Run(os.Args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
-		return 1
+		os.Exit(1)
 	}
-	return 0
 }
