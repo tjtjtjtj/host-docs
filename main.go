@@ -56,8 +56,14 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		s := new(serverlistdata)
 		s.HostsData = new(common.HostsData)
-		s.HostsData.AnsibleSetData(filepath.Clean(c.String("ansibledir")))
-		s.HostsData.ServerspecSetData(filepath.Clean(c.String("serverspecdir")))
+		err := s.HostsData.AnsibleSetData(filepath.Clean(c.String("ansibledir")))
+		if err != nil {
+			return err
+		}
+		err = s.HostsData.ServerspecSetData(filepath.Clean(c.String("serverspecdir")))
+		if err != nil {
+			return err
+		}
 
 		for _, env := range envlist {
 			s.Env = env
@@ -95,6 +101,9 @@ func main() {
 		fmt.Println(string(pvStr))
 	}
 
-	app.Run(os.Args)
-
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+		os.Exit(1)
+	}
 }

@@ -1,6 +1,6 @@
 machine:
   environment:
-    GODIST: "go1.9.1.linux-amd64.tar.gz"
+    GODIST: "go1.9.2.linux-amd64.tar.gz"
     IMPORT_PATH: "$(echo $GOPATH | sed 's/:.*$//g')/src/github.com/$CIRCLE_PROJECT_USERNAME"
     APP_PATH: "$IMPORT_PATH/$CIRCLE_PROJECT_REPONAME"
     TAG: $(cd $CIRCLE_PROJECT_REPONAME && git describe --tags | perl -anlE 'm/\A([^\-]+)-?/; print $1')
