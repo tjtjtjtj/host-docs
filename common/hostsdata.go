@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -37,15 +36,19 @@ type ServerspecData struct {
 }
 
 // AnsibleSetData ansible host_varsのディレクトリより読み込みHostsDataにセット
-func (hostsdata *HostsData) AnsibleSetData(dir string) {
+func (hostsdata *HostsData) AnsibleSetData(dir string) error {
 	err := filepath.Walk(dir, readAnsiblehost(hostsdata))
 	if err != nil {
-		fmt.Print("err")
+		return err
 	}
+	return nil
 }
 
 func readAnsiblehost(hostsdata *HostsData) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.Mode().IsRegular() {
 			buf, err := ioutil.ReadFile(path)
 			if err != nil {
@@ -53,6 +56,9 @@ func readAnsiblehost(hostsdata *HostsData) filepath.WalkFunc {
 			}
 			hostdata := new(HostData)
 			err = yaml.Unmarshal(buf, hostdata)
+			if err != nil {
+				return err
+			}
 			*hostsdata = append(*hostsdata, *hostdata)
 		}
 		return nil
@@ -61,7 +67,7 @@ func readAnsiblehost(hostsdata *HostsData) filepath.WalkFunc {
 
 // ServerspecSetData HostsDataに格納されているIPに対して
 // serverspec host_varsのディレクトリより読み込みHostsDataにセット
-func (hostsdata HostsData) ServerspecSetData(dir string) {
+func (hostsdata HostsData) ServerspecSetData(dir string) error {
 	var serverspecbuf []byte
 	var err error
 Pro_RowLoop:
@@ -69,8 +75,17 @@ Pro_RowLoop:
 	for i := range hostsdata {
 		serverspecbuf, err = ioutil.ReadFile(filepath.Join(dir, hostsdata[i].Ipaddr+".yml"))
 		if err != nil {
-			continue Pro_RowLoop
+			// serverspecのファイルは存在しないこともあるのでerrにしない
+			if os.IsNotExist(err) {
+				continue Pro_RowLoop
+			} else {
+				return err
+			}
 		}
 		err = yaml.Unmarshal(serverspecbuf, &hostsdata[i])
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
