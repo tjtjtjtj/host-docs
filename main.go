@@ -60,7 +60,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		err := s.HostsData.ServerspecSetData(filepath.Clean(c.String("serverspecdir")))
+		err = s.HostsData.ServerspecSetData(filepath.Clean(c.String("serverspecdir")))
 		if err != nil {
 			return err
 		}
