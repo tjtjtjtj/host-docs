@@ -71,7 +71,6 @@ func (hostsdata HostsData) ServerspecSetData(dir string) error {
 	var serverspecbuf []byte
 	var err error
 Pro_RowLoop:
-	//for i, _ := range hostsdata {
 	for i := range hostsdata {
 		serverspecbuf, err = ioutil.ReadFile(filepath.Join(dir, hostsdata[i].Ipaddr+".yml"))
 		if err != nil {
